@@ -51,8 +51,8 @@ public class NV_Frame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(60, 60, 60)
-                .addComponent(QuanLyHopDongBtn)
-                .addContainerGap(215, Short.MAX_VALUE))
+                .addComponent(QuanLyHopDongBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         pack();

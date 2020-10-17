@@ -5,7 +5,12 @@
  */
 
 package demotranhchap;
-
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
 /**
  *
  * @author aguyl
@@ -26,22 +31,27 @@ public class MainJframe extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        openJframe02Button = new javax.swing.JButton();
-        openJframe01Button = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        usernameField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        passwordField = new javax.swing.JPasswordField();
+        loginButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        openJframe02Button.setText("Quản lý nhà");
-        openJframe02Button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openJframe02ButtonActionPerformed(evt);
-            }
-        });
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("QUẢN LÝ THUÊ NHÀ");
 
-        openJframe01Button.setText("Quản lý hợp đồng");
-        openJframe01Button.addActionListener(new java.awt.event.ActionListener() {
+        jLabel2.setText("Tài khoản");
+
+        jLabel3.setText("Mật khẩu");
+
+        loginButton.setText("Đăng nhập");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openJframe01ButtonActionPerformed(evt);
+                loginButtonActionPerformed(evt);
             }
         });
 
@@ -49,35 +59,78 @@ public class MainJframe extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(30, 30, 30)
+                .add(57, 57, 57)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel2)
+                    .add(jLabel3))
+                .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(openJframe01Button, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(openJframe02Button, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(253, Short.MAX_VALUE))
+                    .add(loginButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                    .add(usernameField)
+                    .add(passwordField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(56, 56, 56)
-                .add(openJframe01Button, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(openJframe02Button, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(43, 43, 43)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(usernameField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(18, 18, 18)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(passwordField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(33, 33, 33)
+                .add(loginButton)
+                .add(0, 71, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void openJframe01ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openJframe01ButtonActionPerformed
-        // TODO add your handling code here:
-        new TestJframe01().setVisible(true);
-    }//GEN-LAST:event_openJframe01ButtonActionPerformed
-
-    private void openJframe02ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openJframe02ButtonActionPerformed
-        // TODO add your handling code here:
-        new TestJframe02().setVisible(true);
-    }//GEN-LAST:event_openJframe02ButtonActionPerformed
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        if(usernameField.getText().isEmpty() || passwordField.getText().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
+        
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Connection conn = DriverManager.getConnection("jdbc:sqlserver://localhost;user=sa;password=123456;database=QUANLYTHUENHA;");
+            String query = "SELECT ND.MA, ND.TEN, ND.VAITRO FROM NGUOIDUNG ND WHERE ND.TAIKHOAN = ? AND ND.MATKHAU = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, usernameField.getText());
+            pstmt.setString(2, passwordField.getText());
+            ResultSet rs = pstmt.executeQuery();
+                
+                if(rs.next()) {
+                    String vaitro = rs.getString("VAITRO");
+                    if(vaitro.equals("KHACHHANG")) {
+                        KH_Frame khFrame = new KH_Frame();
+                        khFrame.setVisible(true);
+                        khFrame.setTitle("Phan mem thue nha");
+                    } else if(vaitro.equals("NHANVIEN")) {
+                        NV_Frame nvFrame = new NV_Frame();
+                        nvFrame.setVisible(true);
+                        nvFrame.setTitle("Quan ly thue nha");
+                    } else if(vaitro.equals("CHUNHA")) {
+                        //todo
+                    }
+                    
+                    setVisible(false);
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(null, "Đăng nhập thất bại");
+                }
+                
+                conn.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_loginButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -115,8 +168,12 @@ public class MainJframe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton openJframe01Button;
-    private javax.swing.JButton openJframe02Button;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JButton loginButton;
+    private javax.swing.JPasswordField passwordField;
+    private javax.swing.JTextField usernameField;
     // End of variables declaration//GEN-END:variables
 
 }

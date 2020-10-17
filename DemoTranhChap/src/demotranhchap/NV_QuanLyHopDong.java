@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -22,6 +24,8 @@ public class NV_QuanLyHopDong extends javax.swing.JFrame {
      */
     public NV_QuanLyHopDong() {
         initComponents();
+        ArrayList<HopDong> dshd = getDanhSachHopDong();
+        showDshdToTable(dshd);
     }
 
     /**
@@ -33,21 +37,74 @@ public class NV_QuanLyHopDong extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Ma", "Thong tin nha", "Khach hang", "Nhan vien phu trach", "Tien coc", "Ngay", "Ma nha", "Ma khach hang", "Ma nhan vien"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(1).setMinWidth(200);
+            jTable1.getColumnModel().getColumn(2).setMinWidth(150);
+            jTable1.getColumnModel().getColumn(3).setMinWidth(150);
+            jTable1.getColumnModel().getColumn(6).setMinWidth(10);
+            jTable1.getColumnModel().getColumn(7).setMinWidth(20);
+            jTable1.getColumnModel().getColumn(8).setMinWidth(10);
+        }
+
+        jButton1.setText("Cập nhật người phụ trách mới");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 17, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        //gọi proc cập nhật
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -81,38 +138,79 @@ public class NV_QuanLyHopDong extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new NV_QuanLyHopDong().setVisible(true);
-                getDanhSachHopDong();
             }
         });
     }
+    
+    public void showDshdToTable(ArrayList<HopDong> dshd) {
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
+        DefaultTableModel model =(DefaultTableModel)jTable1.getModel();
+        Object[] row = new Object[9];
+        
+        for(HopDong hd : dshd) {
+            row[0] = hd.ma;
+            row[1] = hd.duong + ", " + hd.quan + ", " + hd.thanhPho + ", " + hd.khuVuc;
+            row[2] = hd.tenKhachHang;
+            row[3] = hd.tenNhanVien;
+            row[4] = hd.tienCoc;
+            row[5] = hd.ngay;
+            row[6] = hd.maNha;
+            row[7] = hd.maKhachhang;
+            row[8] = hd.maNhanVienPhuTrach;                    
+            model.addRow(row);
+        }
+    }
 
-    private static void getDanhSachHopDong() {
+    public ArrayList<HopDong> getDanhSachHopDong() {
+        ArrayList<HopDong> hdList = new ArrayList<HopDong>();
         try {
-            // dang ky driver
-             System.out.println("hi");
-            
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection conn;
 
             // thiet lap ke noi
-            conn = DriverManager.getConnection("jdbc:sqlserver://localhost;user=sa;password=123;database=QUANLYTHUENHA;");
+            conn = DriverManager.getConnection("jdbc:sqlserver://localhost;user=sa;password=123456;database=QUANLYTHUENHA;");
 
-            String query = "select * from HOPDONG"; 
+            String query = 
+                "SELECT HD.MA, HD.MA_NHA, HD.MA_KHACHHANG, HD.MA_NVPHUTRACH, HD.TIENCOC, HD.NGAY, NDNV.TEN AS TEN_NV, NDKH.TEN AS TEN_KH, N.DUONG, N.QUAN, N.KHUVUC, N.THANHPHO\n" +
+                "FROM HOPDONG HD JOIN NHA N ON HD.MA_NHA = N.MA \n" +
+                "JOIN KHACHHANG KH ON HD.MA_KHACHHANG = KH.MA\n" +
+                "JOIN NHANVIEN NV ON HD.MA_NVPHUTRACH = NV.MA\n" +
+                "JOIN NGUOIDUNG NDNV ON NDNV.MA = NV.MA_NGUOIDUNG\n" +
+                "JOIN NGUOIDUNG NDKH ON NDKH.MA = KH.MA_NGUOIDUNG";
             Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query);
-                while (rs.next()) {
-                  int maHD = rs.getInt("MA");
-                  System.out.println(maHD);
-                }
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                    int ma = rs.getInt("MA");
+                    int maNha = rs.getInt("MA_NHA");
+                    int maKhachhang = rs.getInt("MA_KHACHHANG");
+                    int maNhanVienPhuTrach = rs.getInt("MA_NVPHUTRACH");
+                    int tienCoc = rs.getInt("TIENCOC");
+                    String ngay = rs.getString("NGAY");
+                    String tenNhanVien = rs.getString("TEN_NV");
+                    String tenKhachHang = rs.getString("TEN_KH");
+                    String duong= rs.getString("DUONG");
+                    String quan= rs.getString("QUAN");
+                    String khuVuc =rs.getString("KHUVUC");
+                    String thanhPho=rs.getString("THANHPHO");
+                    
+                    HopDong hd = new HopDong (ma, maNha, maKhachhang, maNhanVienPhuTrach, tienCoc, ngay, tenNhanVien, tenKhachHang, duong, quan, khuVuc, thanhPho);
+                    hdList.add(hd);
+             }
               
             // dong ket noi
             conn.close();
+            return hdList;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
+        return null;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
